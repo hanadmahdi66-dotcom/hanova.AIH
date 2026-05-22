@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hanova — Luxury AI Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Splash Screen -->
+  <section id="screen-splash" class="screen active">
+    <div class="splash-content">
+      <div class="logo-mark">H</div>
+      <h1 class="splash-title">Welcome to Hanova</h1>
+      <p class="splash-tagline">Where elegance meets intelligence</p>
+      <div class="splash-loader"><span></span><span></span><span></span></div>
+    </div>
+    <footer class="splash-footer">Powered by MHHS GAME INC</footer>
+  </section>
+
+  <!-- Auth Screen -->
+  <section id="screen-auth" class="screen">
+    <div class="screen-inner auth-inner">
+      <header class="screen-header">
+        <h2>Hanova</h2>
+        <p class="subtitle">Create your account or sign in</p>
+      </header>
+      <div class="auth-tabs">
+        <button type="button" class="tab-btn active" data-tab="signup">Sign Up</button>
+        <button type="button" class="tab-btn" data-tab="login">Log In</button>
+      </div>
+      <form id="form-signup" class="auth-form active">
+        <label>
+          <span>Full Name</span>
+          <input type="text" id="signup-name" placeholder="Your name" required autocomplete="name">
+        </label>
+        <label>
+          <span>Gmail</span>
+          <input type="email" id="signup-email" placeholder="you@gmail.com" required autocomplete="email">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" id="signup-password" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+        </label>
+        <p id="signup-error" class="form-error" hidden></p>
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+      <form id="form-login" class="auth-form">
+        <label>
+          <span>Gmail</span>
+          <input type="email" id="login-email" placeholder="you@gmail.com" required autocomplete="email">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" id="login-password" placeholder="Your password" required autocomplete="current-password">
+        </label>
+        <p id="login-error" class="form-error" hidden></p>
+        <button type="submit" class="btn-primary">Log In</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Choose Plan -->
+  <section id="screen-plans" class="screen">
+    <div class="screen-inner">
+      <header class="screen-header">
+        <h2>Choose Plan</h2>
+        <p class="subtitle">Select the experience that suits you</p>
+      </header>
+      <div class="plans-grid">
+        <article class="plan-card" data-plan="free" data-amount="0">
+          <div class="plan-badge">Starter</div>
+          <h3 class="plan-price">$0</h3>
+          <ul class="plan-benefits">
+            <li>AI via photo & text file uploads</li>
+            <li>20 uploads per day</li>
+            <li>Eloquent AI responses</li>
+            <li>History & settings access</li>
+          </ul>
+          <button type="button" class="btn-plan">Select Free</button>
+        </article>
+        <article class="plan-card featured" data-plan="basic" data-amount="0.99">
+          <div class="plan-badge">Popular</div>
+          <h3 class="plan-price">$0.99<span>/month</span></h3>
+          <ul class="plan-benefits">
+            <li>Everything in Free</li>
+            <li>Type messages to AI</li>
+            <li>Unlimited daily uploads</li>
+            <li>Priority response styling</li>
+          </ul>
+          <button type="button" class="btn-plan">Select Plan</button>
+        </article>
+        <article class="plan-card" data-plan="plus" data-amount="1.5">
+          <div class="plan-badge">Plus</div>
+          <h3 class="plan-price">$1.5<span>/month</span></h3>
+          <ul class="plan-benefits">
+            <li>All Basic features</li>
+            <li>Extended AI memory</li>
+            <li>Faster eloquent answers</li>
+            <li>Export conversation history</li>
+          </ul>
+          <button type="button" class="btn-plan">Select Plan</button>
+        </article>
+        <article class="plan-card" data-plan="premium" data-amount="2">
+          <div class="plan-badge">Elite</div>
+          <h3 class="plan-price">$2<span>/month</span></h3>
+          <ul class="plan-benefits">
+            <li>Full Premium AI chat</li>
+            <li>Unlimited text & uploads</li>
+            <li>VIP support priority</li>
+            <li>Exclusive luxury themes</li>
+          </ul>
+          <button type="button" class="btn-plan">Select Plan</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Payment -->
+  <section id="screen-payment" class="screen">
+    <div class="screen-inner payment-inner">
+      <header class="screen-header">
+        <h2>Complete Payment</h2>
+        <p class="subtitle">Send payment via Zaad to activate your plan</p>
+      </header>
+      <div class="payment-card">
+        <p class="payment-label">Send to</p>
+        <p class="payment-number">+252 633 718 556</p>
+        <p class="payment-label">Amount</p>
+        <p class="payment-amount" id="payment-amount-display">$0.99</p>
+        <div class="ussd-box">
+          <p class="payment-label">Copy payment code</p>
+          <code id="ussd-code" class="ussd-code">2200633718556*0.99#</code>
+          <button type="button" id="btn-copy-ussd" class="btn-secondary">Copy Code</button>
+        </div>
+        <p class="zaad-reminder">📱 Send via <strong>Zaad</strong></p>
+        <button type="button" id="btn-payment-sent" class="btn-primary">I Have Sent Payment</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Waiting Modal -->
+  <div id="modal-waiting" class="modal" hidden>
+    <div class="modal-backdrop"></div>
+    <div class="modal-content waiting-modal">
+      <div class="waiting-spinner"></div>
+      <h3>Verifying Payment</h3>
+      <p>Waiting 2 minutes or 5 minutes</p>
+      <p class="wait-countdown"><span id="wait-time">2</span> min remaining</p>
+      <p class="modal-note">Your plan will activate shortly</p>
+    </div>
+  </div>
+
+  <!-- Home -->
+  <section id="screen-home" class="screen">
+    <header class="home-header">
+      <div class="home-brand">
+        <span class="logo-mark small">H</span>
+        <span>Hanova</span>
+      </div>
+      <span id="user-plan-badge" class="plan-pill">Free</span>
+    </header>
+    <main class="home-main">
+      <p class="greeting" id="home-greeting">Good day</p>
+      <div class="home-actions">
+        <button type="button" class="home-card" data-nav="ai">
+          <span class="card-icon">✦</span>
+          <span class="card-title">AI Assistant</span>
+          <span class="card-desc">Upload or chat with intelligence</span>
+        </button>
+        <button type="button" class="home-card" data-nav="history">
+          <span class="card-icon">◷</span>
+          <span class="card-title">History</span>
+          <span class="card-desc">Your past interactions</span>
+        </button>
+        <button type="button" class="home-card" data-nav="settings">
+          <span class="card-icon">⚙</span>
+          <span class="card-title">Settings</span>
+          <span class="card-desc">Profile & privacy</span>
+        </button>
+      </div>
+    </main>
+    <nav class="bottom-nav">
+      <button type="button" class="nav-item active" data-nav="home">Home</button>
+      <button type="button" class="nav-item" data-nav="ai">AI</button>
+      <button type="button" class="nav-item" data-nav="history">History</button>
+      <button type="button" class="nav-item" data-nav="settings">Settings</button>
+    </nav>
+  </section>
+
+  <!-- AI Screen -->
+  <section id="screen-ai" class="screen">
+    <header class="sub-header">
+      <button type="button" class="btn-back" data-back="home">←</button>
+      <h2>AI Assistant</h2>
+      <span id="uploads-remaining" class="uploads-badge" hidden></span>
+    </header>
+    <div class="ai-container">
+      <div id="ai-response" class="ai-response empty">
+        <p class="ai-placeholder">Upload a photo or text file, or send a message (Premium) to receive an eloquent answer.</p>
+      </div>
+      <div id="ai-premium-chat" class="ai-chat-bar" hidden>
+        <input type="text" id="ai-text-input" placeholder="Ask Hanova anything…">
+        <button type="button" id="btn-send-text" class="btn-send">Send</button>
+      </div>
+      <div class="ai-upload-zone">
+        <label class="upload-btn">
+          <input type="file" id="upload-photo" accept="image/*" hidden>
+          <span>📷 Upload Photo</span>
+        </label>
+        <label class="upload-btn">
+          <input type="file" id="upload-text-file" accept=".txt,.md,.json,text/plain" hidden>
+          <span>📄 Upload Text File</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section id="screen-history" class="screen">
+    <header class="sub-header">
+      <button type="button" class="btn-back" data-back="home">←</button>
+      <h2>History</h2>
+    </header>
+    <ul id="history-list" class="history-list"></ul>
+    <p id="history-empty" class="empty-state">No interactions yet. Start with AI Assistant.</p>
+  </section>
+
+  <!-- Settings -->
+  <section id="screen-settings" class="screen">
+    <header class="sub-header">
+      <button type="button" class="btn-back" data-back="home">←</button>
+      <h2>Settings</h2>
+    </header>
+    <div class="settings-list">
+      <button type="button" class="settings-item" data-settings="profile">
+        <span>Profile</span>
+        <span class="chevron">›</span>
+      </button>
+      <button type="button" class="settings-item" data-settings="privacy">
+        <span>Privacy & Policy</span>
+        <span class="chevron">›</span>
+      </button>
+      <button type="button" class="settings-item danger" id="btn-logout">
+        <span>Log Out</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Profile Panel -->
+  <section id="screen-profile" class="screen">
+    <header class="sub-header">
+      <button type="button" class="btn-back" data-back="settings">←</button>
+      <h2>Profile</h2>
+    </header>
+    <div class="profile-card">
+      <div class="avatar" id="profile-avatar">H</div>
+      <h3 id="profile-name">—</h3>
+      <p id="profile-email">—</p>
+      <p class="profile-plan">Plan: <span id="profile-plan">Free</span></p>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section id="screen-privacy" class="screen">
+    <header class="sub-header">
+      <button type="button" class="btn-back" data-back="settings">←</button>
+      <h2>Privacy & Policy</h2>
+    </header>
+    <div class="privacy-content">
+      <h3>Data We Collect</h3>
+      <p>Your name, email, plan selection, and AI interaction history stored locally and via Firebase Authentication.</p>
+      <h3>How We Use Data</h3>
+      <p>To provide AI features, manage your subscription, and improve Hanova services.</p>
+      <h3>Your Rights</h3>
+      <p>You may request deletion of your account data by contacting MHHS GAME INC.</p>
+      <h3>Third Parties</h3>
+      <p>Firebase handles secure authentication. Payment is processed externally via Zaad.</p>
+      <p class="credits-footer">© Hanova — Powered by MHHS GAME INC</p>
+    </div>
+  </section>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
