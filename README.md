@@ -25,7 +25,19 @@ Open `index.html` in a browser, or serve with any static server:
 npx serve .
 ```
 
-Enable **Email/Password** sign-in in [Firebase Console](https://console.firebase.google.com/) → Authentication → Sign-in method.
+### Firebase setup (required for Sign Up / Log In)
+
+1. Open [Firebase Console → hanova-fe572](https://console.firebase.google.com/project/hanova-fe572/authentication/providers)
+2. **Authentication** → **Sign-in method** → enable **Email/Password** → Save
+3. **Authentication** → **Settings** → **Authorized domains** → add:
+   - `localhost` (for local testing)
+   - `hanadmahdi66-dotcom.github.io` (if using GitHub Pages)
+
+Do **not** open `index.html` by double-clicking (file://). Use a server or GitHub Pages:
+
+```bash
+npx serve .
+```
 
 ## Files
 

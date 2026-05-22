@@ -238,30 +238,78 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 document.getElementById("form-signup").addEventListener("submit", async (e) => {
   e.preventDefault();
   const errEl = document.getElementById("signup-error");
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   errEl.hidden = true;
+
   const name = document.getElementById("signup-name").value.trim();
-  const email = document.getElementById("signup-email").value.trim();
+  const email = document.getElementById("signup-email").value.trim().toLowerCase();
   const password = document.getElementById("signup-password").value;
+
+  const validationError = validateAuthInput(email, password);
+  if (validationError) {
+    errEl.textContent = validationError;
+    errEl.hidden = false;
+    return;
+  }
+
+  if (location.protocol === "file:") {
+    errEl.textContent =
+      "Open the app via a web server or GitHub Pages, not as a local file. Firebase does not work with file:// links.";
+    errEl.hidden = false;
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Creating account…";
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(cred.user, { displayName: name });
     currentUser = cred.user;
     setUserData({ displayName: name, email });
+
+    try {
+      await updateProfile(cred.user, { displayName: name });
+    } catch (profileErr) {
+      console.warn("Display name update skipped:", profileErr);
+    }
+
     showScreen("plans");
     showToast("Account created successfully");
   } catch (err) {
-    errEl.textContent = friendlyAuthError(err.code);
+    console.error("Sign up error:", err.code, err.message);
+    errEl.textContent = friendlyAuthError(err);
     errEl.hidden = false;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Create Account";
   }
 });
 
 document.getElementById("form-login").addEventListener("submit", async (e) => {
   e.preventDefault();
   const errEl = document.getElementById("login-error");
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   errEl.hidden = true;
-  const email = document.getElementById("login-email").value.trim();
+
+  const email = document.getElementById("login-email").value.trim().toLowerCase();
   const password = document.getElementById("login-password").value;
+
+  const validationError = validateAuthInput(email, password, true);
+  if (validationError) {
+    errEl.textContent = validationError;
+    errEl.hidden = false;
+    return;
+  }
+
+  if (location.protocol === "file:") {
+    errEl.textContent =
+      "Open the app via a web server or GitHub Pages, not as a local file. Firebase does not work with file:// links.";
+    errEl.hidden = false;
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Signing in…";
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, password);
@@ -278,22 +326,58 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     }
     showToast("Welcome back");
   } catch (err) {
-    errEl.textContent = friendlyAuthError(err.code);
+    console.error("Log in error:", err.code, err.message);
+    errEl.textContent = friendlyAuthError(err);
     errEl.hidden = false;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Log In";
   }
 });
 
-function friendlyAuthError(code) {
+function validateAuthInput(email, password, isLogin = false) {
+  if (!email) return "Please enter your Gmail address.";
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) return "Please enter a valid email address (e.g. you@gmail.com).";
+  if (!isLogin && password.length < 6) return "Password must be at least 6 characters.";
+  if (!password) return "Please enter your password.";
+  return null;
+}
+
+function friendlyAuthError(err) {
+  const code = err?.code || "";
   const map = {
-    "auth/email-already-in-use": "This Gmail is already registered. Try Log In.",
-    "auth/invalid-email": "Please enter a valid Gmail address.",
+    "auth/email-already-in-use": "This email is already registered. Use Log In instead.",
+    "auth/invalid-email": "Please enter a valid email address.",
     "auth/weak-password": "Password must be at least 6 characters.",
-    "auth/user-not-found": "No account found. Please Sign Up first.",
-    "auth/wrong-password": "Incorrect password.",
-    "auth/invalid-credential": "Invalid email or password.",
-    "auth/too-many-requests": "Too many attempts. Try again later.",
+    "auth/user-not-found": "No account found with this email. Please Sign Up first.",
+    "auth/wrong-password": "Incorrect password. Try again or reset it in Firebase Console.",
+    "auth/invalid-credential": "Wrong email or password. If you are new, use Sign Up.",
+    "auth/too-many-requests": "Too many attempts. Wait a few minutes and try again.",
+    "auth/operation-not-allowed":
+      "Email sign-in is disabled in Firebase. Go to Firebase Console → Authentication → Sign-in method → enable Email/Password.",
+    "auth/unauthorized-domain":
+      "This website is not allowed in Firebase. Add your domain under Authentication → Settings → Authorized domains (include localhost and your GitHub Pages URL).",
+    "auth/network-request-failed":
+      "Network error. Check your internet connection and try again.",
+    "auth/configuration-not-found": "Firebase project not found. Verify your firebaseConfig settings.",
+    "auth/invalid-api-key": "Invalid Firebase API key. Check your project settings.",
+    "auth/missing-password": "Please enter a password.",
+    "auth/missing-email": "Please enter your email address.",
+    "auth/admin-restricted-operation": "This sign-in method is restricted. Enable Email/Password in Firebase Console.",
   };
-  return map[code] || "Authentication failed. Please try again.";
+
+  if (map[code]) return map[code];
+
+  if (err?.message) {
+    const cleaned = err.message
+      .replace(/^Firebase:\s*/i, "")
+      .replace(/\s*\(auth\/[^)]+\)\.?\s*$/i, "")
+      .trim();
+    if (cleaned && cleaned !== "Error") return cleaned;
+  }
+
+  return `Sign-in failed (${code || "unknown"}). Enable Email/Password in Firebase Console and add this site to Authorized domains.`;
 }
 
 // ——— Plans ———
