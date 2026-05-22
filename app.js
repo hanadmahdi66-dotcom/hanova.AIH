@@ -7,6 +7,8 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  setPersistence,
+  browserLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -20,6 +22,46 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+setPersistence(auth, browserLocalPersistence).catch((e) => {
+  console.warn("Auth persistence:", e);
+});
+
+function isLocalDevHost() {
+  const host = location.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
+
+function showAuthHostBanner() {
+  const banner = document.getElementById("auth-host-banner");
+  const link = document.getElementById("auth-localhost-link");
+  if (!banner || !link) return;
+  const port = location.port || "3000";
+  const localhostUrl = `${location.protocol}//localhost:${port}${location.pathname}`;
+  link.href = localhostUrl;
+  link.textContent = localhostUrl;
+  banner.hidden = isLocalDevHost();
+}
+
+function assertFirebaseHost(errEl) {
+  if (location.protocol === "file:") {
+    if (errEl) {
+      errEl.textContent =
+        "Open via http://localhost:3000 — do not double-click index.html.";
+      errEl.hidden = false;
+    }
+    return false;
+  }
+  if (!isLocalDevHost() && location.hostname !== "hanadmahdi66-dotcom.github.io") {
+    if (errEl) {
+      errEl.textContent = `Firebase blocks "${location.hostname}". Open http://localhost:${location.port || "3000"} instead.`;
+      errEl.hidden = false;
+    }
+    showAuthHostBanner();
+    return false;
+  }
+  return true;
+}
 
 const PAYMENT_NUMBER = "+252633718556";
 const USSD_PREFIX = "2200633718556";
@@ -77,16 +119,27 @@ function storageKey(key) {
   return `hanova_${uid}_${key}`;
 }
 
+function setUserData(data, uid) {
+  const id = uid || currentUser?.uid || "guest";
+  const key = `hanova_${id}_profile`;
+  const existing = JSON.parse(localStorage.getItem(key) || "{}");
+  localStorage.setItem(key, JSON.stringify({ ...existing, ...data }));
+}
+
 function getUserData() {
+  const uid = currentUser?.uid;
+  if (!uid) {
+    try {
+      return JSON.parse(localStorage.getItem("hanova_guest_profile") || "{}");
+    } catch {
+      return {};
+    }
+  }
   try {
-    return JSON.parse(localStorage.getItem(storageKey("profile")) || "{}");
+    return JSON.parse(localStorage.getItem(`hanova_${uid}_profile`) || "{}");
   } catch {
     return {};
   }
-}
-
-function setUserData(data) {
-  localStorage.setItem(storageKey("profile"), JSON.stringify({ ...getUserData(), ...data }));
 }
 
 function isPremium() {
@@ -222,6 +275,7 @@ function routeAfterSplash() {
     }
   } else {
     showScreen("auth");
+    showAuthHostBanner();
   }
 }
 
@@ -252,12 +306,7 @@ document.getElementById("form-signup").addEventListener("submit", async (e) => {
     return;
   }
 
-  if (location.protocol === "file:") {
-    errEl.textContent =
-      "Open the app via a web server or GitHub Pages, not as a local file. Firebase does not work with file:// links.";
-    errEl.hidden = false;
-    return;
-  }
+  if (!assertFirebaseHost(errEl)) return;
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Creating account…";
@@ -265,7 +314,7 @@ document.getElementById("form-signup").addEventListener("submit", async (e) => {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     currentUser = cred.user;
-    setUserData({ displayName: name, email });
+    setUserData({ displayName: name, email }, cred.user.uid);
 
     try {
       await updateProfile(cred.user, { displayName: name });
@@ -301,12 +350,7 @@ document.getElementById("form-login").addEventListener("submit", async (e) => {
     return;
   }
 
-  if (location.protocol === "file:") {
-    errEl.textContent =
-      "Open the app via a web server or GitHub Pages, not as a local file. Firebase does not work with file:// links.";
-    errEl.hidden = false;
-    return;
-  }
+  if (!assertFirebaseHost(errEl)) return;
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Signing in…";
@@ -356,8 +400,8 @@ function friendlyAuthError(err) {
     "auth/too-many-requests": "Too many attempts. Wait a few minutes and try again.",
     "auth/operation-not-allowed":
       "Email sign-in is disabled in Firebase. Go to Firebase Console → Authentication → Sign-in method → enable Email/Password.",
-    "auth/unauthorized-domain":
-      "This website is not allowed in Firebase. Add your domain under Authentication → Settings → Authorized domains (include localhost and your GitHub Pages URL).",
+    "auth/unauthorized-domain": () =>
+      `Firebase blocked "${location.hostname}". Open http://localhost:${location.port || "3000"} (not the Network IP). Add "localhost" in Firebase → Authentication → Settings → Authorized domains.`,
     "auth/network-request-failed":
       "Network error. Check your internet connection and try again.",
     "auth/configuration-not-found": "Firebase project not found. Verify your firebaseConfig settings.",
@@ -367,7 +411,10 @@ function friendlyAuthError(err) {
     "auth/admin-restricted-operation": "This sign-in method is restricted. Enable Email/Password in Firebase Console.",
   };
 
-  if (map[code]) return map[code];
+  if (map[code]) {
+    const msg = map[code];
+    return typeof msg === "function" ? msg() : msg;
+  }
 
   if (err?.message) {
     const cleaned = err.message
@@ -571,5 +618,6 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ——— Init ———
+showAuthHostBanner();
 showScreen("splash");
 startSplash();

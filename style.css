@@ -256,6 +256,22 @@ body {
   line-height: 1.4;
 }
 
+.auth-host-banner {
+  font-size: 0.85rem;
+  color: var(--gold-light);
+  background: rgba(201, 169, 98, 0.12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.45;
+}
+
+.auth-host-banner a {
+  color: var(--gold);
+  font-weight: 500;
+}
+
 /* Buttons */
 .btn-primary {
   padding: 1rem 1.5rem;

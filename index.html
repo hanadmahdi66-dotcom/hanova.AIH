@@ -8,6 +8,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    (function () {
+      var host = location.hostname;
+      var isIP = /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
+      if (host === "127.0.0.1" || isIP) {
+        var port = location.port || "3000";
+        location.replace(
+          location.protocol + "//localhost:" + port + location.pathname + location.search + location.hash
+        );
+      }
+    })();
+  </script>
 </head>
 <body>
   <!-- Splash Screen -->
@@ -28,6 +40,9 @@
         <h2>Hanova</h2>
         <p class="subtitle">Create your account or sign in</p>
       </header>
+      <p id="auth-host-banner" class="auth-host-banner" hidden>
+        Use <a id="auth-localhost-link" href="#">http://localhost:3000</a> for sign-in (required by Firebase).
+      </p>
       <div class="auth-tabs">
         <button type="button" class="tab-btn active" data-tab="signup">Sign Up</button>
         <button type="button" class="tab-btn" data-tab="login">Log In</button>
